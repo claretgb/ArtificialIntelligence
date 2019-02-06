@@ -1,7 +1,6 @@
 import time
 start = time.time()
 
-from queue import Queue
 from copy import copy
 
 class Node:
@@ -33,10 +32,10 @@ class Solution:
 solution = [] #type: list
 benefit = 0
 weight = 0
-current_solution = Solution(solution, benefit, weight)
+current_solution_dfs = Solution(solution, benefit, weight)
 
 def read_file():
-    input_file  = open("assignment1knapsack.txt", "r")
+    input_file  = open("assignment1/assignment1knapsack.txt", "r")
     input_file.readline()
     input_file.readline()
     input_file.readline()
@@ -59,66 +58,71 @@ def read_file():
     # File read.
     return items, max_weight
 
-# Knapsack by BFS function.
+def is_solution(node):
+    for i in range (0, len(node.solution)):
+        if node.solution[i] == -1:
+            return False
+    return True
 
-def knapsack_bfs():
-    global current_solution
+# Knapsack by DFS function.
+
+def knapsack_dfs():
+    global current_solution_dfs
     items, max_weight = read_file()
     # I create the tree.
     empty_node_sol = [] #type: list
     while len(empty_node_sol) < len(items):
         empty_node_sol.append(-1)
     empty_node = Node(empty_node_sol, 0, 0, 0, 0, 0)
-    queue = Queue(maxsize = 0)
-    queue.put(empty_node)
-    for depth in range(0, (len(items)+1)):
-        elements_in_depth = 2**depth
-        if depth == 0:
-            elements_in_depth = 1
-        while elements_in_depth > 0:
-            node = queue.get()
-            # I add the children to the tree.
-            if node.current_weight+items[depth-1][1] <= max_weight:
-                solution_0 = copy(node.solution)
-                solution_0[depth-1] = 0
-                child = Node(solution_0, items[depth-1][0], items[depth-1][1], node.current_benefit, node.current_weight, depth+1)
-                queue.put(child)
-                solution_1 = copy(node.solution)
-                solution_1[depth-1] = 1
-                child = Node(solution_1, items[depth-1][0], items[depth-1][1], node.current_benefit+items[depth-1][0], node.current_weight+items[depth-1][1], depth+1)
-                queue.put(child)
+    stack = [] # type: list
+    stack.append(empty_node)
+    depth = len(items)
+    while len(stack) != 0:
+        node = stack.pop()
+        # I add the children to the tree.
+        if not is_solution(node):
+            for i in range (0, len(node.solution)):
+                if node.solution[i] == -1:
+                    depth = i
+                    break
+            if (node.current_weight+items[depth][1]) <= max_weight:
+                if depth < len(items):
+                    solution_1 = copy(node.solution)
+                    solution_1[depth] = 1
+                    child = Node(solution_1, items[depth][0], items[depth][1], node.current_benefit+items[depth][0], node.current_weight+items[depth][1], depth+1)
+                    stack.append(child)
+                    solution_0 = copy(node.solution)
+                    solution_0[depth] = 0
+                    child = Node(solution_0, items[depth][0], items[depth][1], node.current_benefit, node.current_weight, depth+1)
+                    stack.append(child)
             else:
                 for i in range (0, len(node.solution)):
                     if node.solution[i] == -1:
                         node.solution[i] = 0
-                #Is solution.
-                if current_solution.final_benefit < node.current_benefit:
-                    current_solution.solution = node.solution
-                    current_solution.final_benefit = node.current_benefit
-                    current_solution.final_weight = node.current_weight
-                else:
-                    if current_solution.final_benefit == node.current_benefit:
-                        if current_solution.final_weight > node.current_weight:
-                            current_solution.solution = node.solution
-                            current_solution.final_benefit = node.current_benefit
-                            current_solution.final_weight = node.current_weight
-            elements_in_depth -= 1
-    # End for.
-
-# Knapsack by DFS function.
-
-def knapsack_dfs():
-    print("not yet")
+        #Is solution.
+        if current_solution_dfs.final_benefit < node.current_benefit:
+            current_solution_dfs.solution = node.solution
+            current_solution_dfs.final_benefit = node.current_benefit
+            current_solution_dfs.final_weight = node.current_weight
+        """else:
+            if current_solution_dfs.final_benefit == node.current_benefit:
+                if current_solution_dfs.final_weight > node.current_weight:
+                    current_solution_dfs.solution = node.solution
+                    current_solution_dfs.final_benefit = node.current_benefit
+                    current_solution_dfs.final_weight = node.current_weight"""
 
 # Main function.
+print("DFS:")
+knapsack_dfs()
+# I change the array so it represents which nodes go into the knapsack.
+solution3 = [] #type: list
+sol_dfs = current_solution_dfs.solution
+for i in range (0, len(sol_dfs)):   
+    if sol_dfs[i] == 1:
+        solution3.append(i+1)
+# I print the solution.
+print(solution3, current_solution_dfs.final_benefit, current_solution_dfs.final_weight)
 
-knapsack_bfs()
-solution2 = [] #type: list
-sol = current_solution.solution
-for i in range (0, len(sol)):   
-    if sol[i] == 1:
-        solution2.append(i+1)
-print(solution2, current_solution.final_benefit, current_solution.final_weight)
-
+print("Execution time:")
 end = time.time()
 print(end - start)

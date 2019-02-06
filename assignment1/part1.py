@@ -37,7 +37,7 @@ current_solution_bfs = Solution(solution, benefit, weight)
 current_solution_dfs = Solution(solution, benefit, weight)
 
 def read_file():
-    input_file  = open("assignment1knapsack.txt", "r")
+    input_file  = open("assignment1/assignment1knapsack.txt", "r")
     input_file.readline()
     input_file.readline()
     input_file.readline()
@@ -102,7 +102,6 @@ def knapsack_bfs():
                     current_solution_bfs.solution = node.solution
                     current_solution_bfs.final_benefit = node.current_benefit
                     current_solution_bfs.final_weight = node.current_weight"""
-    # End for.
 
 def is_solution(node):
     for i in range (0, len(node.solution)):
@@ -120,11 +119,11 @@ def knapsack_dfs():
     while len(empty_node_sol) < len(items):
         empty_node_sol.append(-1)
     empty_node = Node(empty_node_sol, 0, 0, 0, 0, 0)
-    queue = Queue(maxsize = 0)
-    queue.put(empty_node)
+    stack = [] # type: list
+    stack.append(empty_node)
     depth = len(items)
-    while not queue.empty():
-        node = queue.get()
+    while len(stack) != 0:
+        node = stack.pop()
         # I add the children to the tree.
         if not is_solution(node):
             for i in range (0, len(node.solution)):
@@ -133,14 +132,18 @@ def knapsack_dfs():
                     break
             if (node.current_weight+items[depth][1]) <= max_weight:
                 if depth < len(items):
-                    solution_0 = copy(node.solution)
-                    solution_0[depth] = 0
-                    child = Node(solution_0, items[depth][0], items[depth][1], node.current_benefit, node.current_weight, depth+1)
-                    queue.put(child)
                     solution_1 = copy(node.solution)
                     solution_1[depth] = 1
                     child = Node(solution_1, items[depth][0], items[depth][1], node.current_benefit+items[depth][0], node.current_weight+items[depth][1], depth+1)
-                    queue.put(child)
+                    stack.append(child)
+                    solution_0 = copy(node.solution)
+                    solution_0[depth] = 0
+                    child = Node(solution_0, items[depth][0], items[depth][1], node.current_benefit, node.current_weight, depth+1)
+                    stack.append(child)
+            else:
+                for i in range (0, len(node.solution)):
+                    if node.solution[i] == -1:
+                        node.solution[i] = 0
         #Is solution.
         if current_solution_dfs.final_benefit < node.current_benefit:
             current_solution_dfs.solution = node.solution
@@ -152,7 +155,6 @@ def knapsack_dfs():
                     current_solution_dfs.solution = node.solution
                     current_solution_dfs.final_benefit = node.current_benefit
                     current_solution_dfs.final_weight = node.current_weight"""
-    # End for.
 
 # Main function.
 
