@@ -1,3 +1,9 @@
+"""
+    Source code created for DVA340 - Artificiell Intelligens.
+    Code writer:
+        - Clara Torre García-Barredo.
+    Code created on February 2019.
+"""
 import time
 start = time.time()
 
