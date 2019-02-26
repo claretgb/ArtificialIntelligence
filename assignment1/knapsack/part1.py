@@ -47,7 +47,7 @@ current_solution_bfs = Solution(solution, benefit, weight)
 current_solution_dfs = Solution(solution, benefit, weight)
 
 def read_file():
-    input_file  = open("assignment1/assignment1knapsack.txt", "r")
+    input_file  = open("assignment1/knapsack/assignment1knapsack.txt", "r")
     input_file.readline()
     input_file.readline()
     input_file.readline()
