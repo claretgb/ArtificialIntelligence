@@ -62,30 +62,49 @@ def check_possibilities(sudoku, row_index, col_index):
                     possibilities.remove(i)
     return possibilities
 
-def find_first_zero(sudoku):
+def find_zero_least_possiblities(sudoku, possibilities):
+    min_row_index = 10
+    min_col_index = 10
+    min_number = 10
     row_index = 0
     for row in sudoku:
         col_index = 0
-        for cell in range (0, len(row)):
+        for cell in range (0, 9):
             if row[cell] == 0:
-                return row_index, col_index
+                if len(possibilities[row_index][col_index]) < min_number: 
+                    min_row_index = row_index
+                    min_col_index = col_index
+                    min_number = len(possibilities[row_index][col_index])
             col_index += 1
         row_index += 1
-    return 10, 10
+    return min_row_index, min_col_index
 
 def solve_sudoku(sudoku):
     stack = [] #type: list
+    possibilities = [] #type: list
+    for row_index in range(0,9):
+        possibilities_row = [] #type: list
+        for col_index in range(0,9):
+            if sudoku[row_index][col_index] == 0:
+                possibilities_row.append(check_possibilities(sudoku, row_index, col_index))
+            else: 
+                possibilities_row.append([])
+        possibilities.append(possibilities_row)
     stack.append(sudoku)
     while len(stack) > 0:
         current_sudoku = stack.pop()
-        row_index, col_index = find_first_zero(current_sudoku)
+        row_index, col_index = find_zero_least_possiblities(current_sudoku, possibilities)
         if row_index == 10 or col_index == 10:
             break
-        possibilities = check_possibilities(current_sudoku, row_index, col_index)
-        for i in possibilities:
-            sudoku_possible = deepcopy(current_sudoku)
-            sudoku_possible[row_index][col_index] = i
-            stack.append(sudoku_possible)
+        current_possibilities = check_possibilities(current_sudoku, row_index, col_index)
+        for i in current_possibilities:
+            if len(current_possibilities) == 1:
+                current_sudoku[row_index][col_index] = i
+                stack.append(current_sudoku)
+            else:
+                sudoku_possible = deepcopy(current_sudoku)
+                sudoku_possible[row_index][col_index] = i
+                stack.append(sudoku_possible)
     return current_sudoku
 # Main function.
 
