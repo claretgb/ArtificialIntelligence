@@ -168,7 +168,7 @@ def knapsack_dfs():
 
 # Main function.
 
-"""print("BFS:")
+print("BFS:")
 knapsack_bfs()
 # I change the array so it represents which nodes go into the knapsack.
 solution2 = [] #type: list
@@ -177,7 +177,7 @@ for i in range (0, len(sol)):
     if sol[i] == 1:
         solution2.append(i+1)
 # I print the solution.
-print(solution2, current_solution_bfs.final_benefit, current_solution_bfs.final_weight)"""
+print(solution2, current_solution_bfs.final_benefit, current_solution_bfs.final_weight)
 print("DFS:")
 knapsack_dfs()
 # I change the array so it represents which nodes go into the knapsack.
