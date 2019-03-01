@@ -39,8 +39,8 @@ def check_possibilities(sudoku, row_index, col_index):
             possibilities.remove(i)
     # I check the column second.
     for i in range (0,9):
-        for j in range (1,10):
-            if j == sudoku[i][col_index] and j in possibilities:
+        for j in possibilities:
+            if j == sudoku[i][col_index]:
                 possibilities.remove(j)
     # I check the 3x3 square last.
     if row_index in [0, 1, 2]:
@@ -57,8 +57,8 @@ def check_possibilities(sudoku, row_index, col_index):
         n = 6
     for j in range(0,3): #j refers to rows
         for k in range(0,3): #k refers to columns
-            for i in range(1,10):
-                if i == sudoku[m+j][n+k] and i in possibilities:
+            for i in possibilities:
+                if i == sudoku[m+j][n+k]:
                     possibilities.remove(i)
     return possibilities
 
