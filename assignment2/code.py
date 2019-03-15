@@ -20,14 +20,29 @@ class City:
 	name = ""
 	straight_distance = 0
 	connections = []  # type: list
+	father = None
+	distance_walked = 0
+	a_star_value = 0
 
 	def __init__(self, name, straight_distance):
 		self.name = name
 		self.straight_distance = straight_distance
 		self.connections = []
+		self.path_already_taken = []
+		self.distance_walked = 0
+		self.a_star_value = 0
 
 	def addConection(self, connection, distance):
 		self.connections.append([connection, distance])
+	
+	def change_father(self, city):
+		self.father = city
+
+	def update_distance_walked(self, distance):
+		self.distance_walked = self.father.distance_walked + distance
+
+	def update_astar(self):
+		self.a_star_value = self.distance_walked + self.straight_distance
 
 """
 	I use this class to keep all the information
@@ -55,7 +70,7 @@ class Solution:
 def read_file():
 	global number_of_cities
 	input_file = open("assignment2/cities.txt", "r")
-	cities = {}  # type: list
+	cities = {} 
 	for line in input_file:
 		split_line = line.split(" ")
 		city = copy(City(split_line.pop(0), int(split_line.pop(0))))
@@ -70,21 +85,14 @@ def read_file():
 	their straight line distance with
 	Valladolid for the Greedy algorithm.
 """
-def sort_max(array_connections, cities):
-	aux = []  # type: list
-	for i in range(len(array_connections)):
-		aux.append(cities[array_connections[i][0]])
-	for i in range(len(array_connections)):
-		for j in range(len(array_connections)):
-			if i < j:
-				if (cities[aux[i].name].straight_distance) > (cities[aux[j].name].straight_distance):
-					aux[i] = aux[i]
-					aux[j] = aux[j]
-				else:
-					extra = aux[i]
-					aux[i] = aux[j]
-					aux[j] = extra
-	return aux
+def sort_max(stack):
+	for i in range(len(stack)):
+		for j in range(len(stack)):
+			if stack[i].straight_distance < stack[j].straight_distance:
+				extra = stack[i]
+				stack[i] = stack[j]
+				stack[j] = extra
+	return stack
 
 """
 	This method sorts an array of cities
@@ -92,21 +100,14 @@ def sort_max(array_connections, cities):
 	their straight line distance with
 	Valladolid for the A* algorithm.
 """
-def sort_max_a_star(array_connections, cities):
-	aux = []  # type: list
-	for i in range(len(array_connections)):
-		aux.append(array_connections[i])
-	for i in range(len(array_connections)):
-		for j in range(len(array_connections)):
-			if i < j:
-				if aux[i][1] > aux[j][1]:
-					aux[i] = aux[i]
-					aux[j] = aux[j]
-				else:
-					extra = aux[i]
-					aux[i] = aux[j]
-					aux[j] = extra
-	return aux
+def sort_max_a_star(stack):
+	for i in range(len(stack)):
+		for j in range(i+1,len(stack)):
+			if stack[i].a_star_value > stack[j].a_star_value:
+				extra = stack[i]
+				stack[i] = stack[j]
+				stack[j] = extra
+	return stack
 
 """
 	This method updates the distance between
@@ -134,12 +135,9 @@ def greedy_algorithm(cities):
 		solution.add(city.name)
 		if city.name == 'Valladolid':
 			break
-		if len(cities[city.name].connections) == 1:
-			stack.insert(0,cities[cities[city.name].connections[0][0]])
-		else:
-			aux = sort_max(cities[city.name].connections, cities)
-			for i in range(0, len(cities[city.name].connections)):
-				stack.insert(0,aux[i])
+		for i in range(0, len(cities[city.name].connections)):
+			stack.append(cities[cities[city.name].connections[i][0]])
+		stack = sort_max(stack)
 		for connection in city.connections:
 			if connection[0] == stack[0].name:
 				solution.update_final_distance(connection[1])
@@ -151,27 +149,35 @@ def greedy_algorithm(cities):
 	the problem with the A* algorithm.
 """
 def a_star(cities):
-	stack = []  # type: list
+	stack = []  #type: list
+	visited = [] #type: list
 	solution = Solution([], 0)
 	stack.append(cities['Malaga'])
-	distance = 0
+	finished = False
 	while len(stack) > 0:
-		city = stack.pop(0)
-		solution.add(city.name)
+		city_visited = True
+		while city_visited:
+			city = stack.pop(0)
+			if city not in visited:
+				city_visited = False
+		visited.append(city)
 		if city.name == 'Valladolid':
 			break
 		for i in range(len(cities[city.name].connections)):
-			acc = distance + cities[city.name].connections[i][1] + cities[cities[city.name].connections[i][0]].straight_distance
-			cities[city.name].connections[i].pop()
-			cities[city.name].connections[i].append(acc)
-		if len(cities[city.name].connections) == 1:
-			stack.insert(0,cities[cities[city.name].connections[0][0]])
-		else:
-			aux = sort_max_a_star(cities[city.name].connections, cities)
-			for i in range(0, len(cities[city.name].connections)):
-				stack.insert(0,cities[aux[i][0]])
-		distance = update_distance(distance, stack[0], city.name)
-	solution.update_final_distance(distance)
+			if cities[city.connections[i][0]].father is None and city.connections[i][0] != 'Malaga':
+				cities[city.connections[i][0]].change_father(city)
+				cities[city.connections[i][0]].update_distance_walked(city.connections[i][1])
+				cities[city.connections[i][0]].update_astar()
+		for i in range(0, len(city.connections)):
+			stack.append(cities[city.connections[i][0]])
+		stack = sort_max_a_star(stack)
+	city_visited = city
+	while not finished:
+		solution.solution.insert(0,city_visited.name)
+		city_visited = city_visited.father
+		if city_visited == None:
+			finished = True
+	solution.update_final_distance(city.distance_walked)
 	return solution
 
 
