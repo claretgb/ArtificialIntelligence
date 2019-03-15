@@ -10,7 +10,7 @@ start = time.time()
 from copy import deepcopy
 
 def read_file():
-    input_file  = open("assignment1/sudokus/assignment1sudoku.txt", "r")
+    input_file  = open("assignment1sudoku.txt", "r")
     input_file.readline()
     input_file.readline()
     number_of_sudokus = int(input_file.readline().split()[1])
@@ -106,8 +106,8 @@ def solve_sudoku(sudoku):
                 sudoku_possible[row_index][col_index] = i
                 stack.append(sudoku_possible)
     return current_sudoku
-# Main function.
 
+# Main function.
 sudokus = read_file()
 solution = [] #type: list
 for sudoku in sudokus:

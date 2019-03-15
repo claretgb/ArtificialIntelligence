@@ -1,0 +1,49 @@
+Malaga 550 Granada 124 Sevilla 206 Cadiz 235
+Almeria 571 Granada 167 Murcia 218
+Granada 507 Jaen 92 Almeria 167 Malaga 124
+Jaen 439 Granada 92 Cordoba 120 Madrid 331
+Cordoba 419 Jaen 120 Sevilla 140 CiudadReal 195
+Huelva 525 Cadiz 210
+Sevilla 487 Cadiz 121 Merida 192 Cordoba 140 Malaga 206
+Cadiz 586 Malaga 235 Huelva 210 Sevilla 121
+Murcia 510 Albacete 146 Alicante 81 Almeria 218
+Albacete 383 Alicante 167 Cuenca 144 Madrid 257 Murcia 146
+Alicante 515 Valencia 166 Murcia 81 Albacete 167
+Valencia 441 Castellon 74 Cuenca 199 Alicante 166
+Castellon 435 Tarragona 187 Teruel 144 Valencia 74
+Tarragona 502 Barcelona 99 Castellon 187
+Barcelona 576 Lleida 163 Gerona 103 Tarragona 99
+Lleida 445 Gerona 229 Huesca 112 Zaragoza 152 Barcelona 163
+Gerona 627 Barcelona 103 Lleida 229
+Merida 334 Badajoz 64 Caceres 75 Sevilla 192
+Badajoz 363 Merida 64
+Caceres 280 Madrid 301 Salamanca 202 Merida 75
+CiudadReal 305 Toledo 118 Cordoba 195
+Toledo 208 Madrid 72 CiudadReal 118
+Cuenca 280 Teruel 148 Madrid 168 Albacete 144 Valencia 199
+Guadalajara 173 Zaragoza 256 Soria 171 Madrid 60
+Zaragoza 319 Teruel 171 Huesca 74 Pamplona 178 Soria 159 Lleida 152 Guadalajara 256
+Teruel 337 Castellon 144 Cuenca 148 Zaragoza 171
+Huesca 362 Pamplona 165 Lleida 112 Zaragoza 74
+Logrono 209 Soria 101 Vitoria 94
+Vitoria 215 Burgos 118 SanSebastian 100 Bilbao 62 Logrono 94
+Bilbao 232 SanSebastian 101 Santander 100 Vitoria 62
+SanSebastian 292 Vitoria 100 Bilbao 101
+Santander 215 Burgos 181 Oviedo 192 Bilbao 100
+Oviedo 212 Leon 125 Lugo 227 Coruna 287 Santander 192
+Coruna 357 Lugo 98 Santiago 75 Oviedo 287
+Santiago 343 Pontevedra 64 Coruna 75
+Pontevedra 335 Lugo 195 Orense 119 Santiago 64
+Orense 271 Zamora 259 Pontevedra 119
+Lugo 278 Leon 223 Oviedo 227 Coruna 98 Pontevedra 195
+Madrid 162 Burgos 245 Segovia 92 Avila 109 Jaen 331 Albacete 257 Caceres 301 Toledo 72 Cuenca 168 Guadalajara 60
+Leon 126 Valladolid 136 Zamora 141 Oviedo 125 Lugo 223
+Zamora 87 Salamanca 66 Valladolid 100 Orense 259 Leon 141
+Salamanca 109 Avila 109 Caceres 202 Zamora 66
+Segovia 94 Avila 66 Valladolid 115 Madrid 92
+Valladolid 0 Palencia 51 Leon 136 Zamora 100 Segovia 115
+Burgos 114 Palencia 92 Soria 142 Vitoria 118 Santander 181 Madrid 245
+Palencia 43 Valladolid 51 Burgos 92
+Soria 187 Guadalajara 171 Zaragoza 159 Logrono 101 Burgos 142
+Pamplona 284 Zaragoza 178 Huesca 165
+Avila 110 Madrid 109 Salamanca 109 Segovia 66
