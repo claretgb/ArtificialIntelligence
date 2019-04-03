@@ -170,12 +170,12 @@ def generate_offspring(parent_i, parent_j):
 
 def mutate_population(children):
 	global individuals
-	rand1 = random.randint(1,len(children)-1)
+	rand1 = random.randint(1,NUMBER_OF_LOCATIONS-1)
 	rand2 = random.randint(1,NUMBER_OF_LOCATIONS-1)
-	rand3 = random.randint(1,NUMBER_OF_LOCATIONS-1)
-	aux = individuals[children[rand1]].locations[rand2]
-	individuals[children[rand1]].locations[rand2] = individuals[children[rand1]].locations[rand3]
-	individuals[children[rand1]].locations[rand3] = aux
+	rand3 = random.randint(1,len(children)-1)
+	aux = individuals[children[rand3]].locations[rand1]
+	individuals[children[rand3]].locations[rand1] = individuals[children[rand3]].locations[rand2]
+	individuals[children[rand3]].locations[rand2] = aux
 
 # Main function.
 
