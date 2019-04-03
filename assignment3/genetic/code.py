@@ -137,9 +137,9 @@ def select_best_individual():
 
 def generate_offspring(parent_i, parent_j):
 	global individuals
-	kill = [] #type: list
-	for l in range(0,2):
-		rand = random.randint(1,51)
+	children = [] #type: list
+	for l in range(0,POP_SIZE//4):
+		rand = random.randint(1,POP_SIZE-1)
 		offspring_i = [] #type: list
 		offspring_j = [] #type: list
 		for i in range(rand):
@@ -158,12 +158,12 @@ def generate_offspring(parent_i, parent_j):
 		for i in range(rand):
 			if parent_j.locations[i] not in offspring_j:
 				offspring_j[offspring_j.index(0)] = parent_j.locations[i]
-		kill_i, kill_j = find_worst_individuals()
-		individuals[kill_i] = Individual(offspring_i)
-		individuals[kill_j] = Individual(offspring_j)
-		kill.append(kill_i)
-		kill.append(kill_j)
-	return kill
+		index_worst, index_2worst = find_worst_individuals()
+		individuals[index_worst] = Individual(offspring_i)
+		individuals[index_2worst] = Individual(offspring_j)
+		children.append(index_worst)
+		children.append(index_2worst)
+	return children
 
 def mutate_population(children):
 	global individuals
@@ -180,7 +180,8 @@ read_file()
 best_distance_yet = 40000
 # We initialize the population.
 for i in range(POP_SIZE):
-		random_path_generator()
+	random_path_generator()
+counter = 0
 while True:
 	# We select the parents.
 	parent_i, parent_j = parents_selection()
@@ -191,7 +192,9 @@ while True:
 		print("Best distance:", best.distance)
 		best_distance_yet = best.distance
 	if best.distance < 9000:
-		break
+		if counter >= STOP_ITER_NUMBER:
+			break
+		counter += 1
 
 print("This is the solution:")
 print(best.locations)
