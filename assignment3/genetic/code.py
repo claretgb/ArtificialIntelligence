@@ -139,25 +139,28 @@ def generate_offspring(parent_i, parent_j):
 	global individuals
 	children = [] #type: list
 	for l in range(0,POP_SIZE//4):
-		rand = random.randint(1,POP_SIZE-1)
+		aux = [] #type: list
+		rand1 = random.randint(1,NUMBER_OF_LOCATIONS-2)
+		rand2 = random.randint(rand1,NUMBER_OF_LOCATIONS-1)
 		offspring_i = [] #type: list
-		offspring_j = [] #type: list
-		for i in range(rand):
-			offspring_i.append(parent_i.locations[i])
+		for i in range(rand1, rand2):
+			aux.append(parent_i.locations[i])
 		for i in range(NUMBER_OF_LOCATIONS):
-			if parent_j.locations[i] not in offspring_i:
+			if parent_j.locations[i] not in aux:
 				offspring_i.append(parent_j.locations[i])
-		for i in range(rand):
-			if parent_j.locations[i] not in offspring_i:
-				offspring_i[offspring_i.index(0)] = parent_j.locations[i]
-		for i in range(rand):
-			offspring_j.append(parent_j.locations[i])
+		for i in range(rand1, rand2):
+			offspring_i.insert(i, aux[i-rand1])
+		offspring_j = [] #type: list
+		aux = [] #type: list
+		rand1 = random.randint(1,NUMBER_OF_LOCATIONS-2)
+		rand2 = random.randint(rand1,NUMBER_OF_LOCATIONS-1)
+		for i in range(rand1, rand2):
+			aux.append(parent_i.locations[i])
 		for i in range(NUMBER_OF_LOCATIONS):
-			if parent_j.locations[i] not in offspring_j:
+			if parent_j.locations[i] not in aux:
 				offspring_j.append(parent_j.locations[i])
-		for i in range(rand):
-			if parent_j.locations[i] not in offspring_j:
-				offspring_j[offspring_j.index(0)] = parent_j.locations[i]
+		for i in range(rand1, rand2):
+			offspring_j.insert(i, aux[i-rand1])
 		index_worst, index_2worst = find_worst_individuals()
 		individuals[index_worst] = Individual(offspring_i)
 		individuals[index_2worst] = Individual(offspring_j)
