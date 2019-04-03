@@ -8,3 +8,18 @@ After turning in the code, I have received a 2.6/3 mark, due to some minor mathe
 
 Part 2 consists of the sudoku problem, which must be solved with DFS.
 That is done in part2.py, under 1 second of execution.
+After turning in the code, I have received a 2/2 mark.
+
+Total grade: 4.6/5.
+
+#Assignment 2. Spain map. 
+This assignment consists of creating a path between two Spanish cities, Malaga and Valladolid, 
+using two different algorithms: Greedy best-first search algorithm and A* algorithm. 
+
+After turning in the code, I have received a 5/5 mark.
+
+#Assignment 3. Travelling salesman problem.
+Part 1 consists of solving the travelling salesman problem using a Genetic Algorithm of our creation.
+We need to start in location 1 and go through the 52 locations in Berlin with the shortest route possible, 
+finishing also in location 1. 
+This assignment is still being developed.
