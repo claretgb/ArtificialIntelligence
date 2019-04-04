@@ -184,7 +184,6 @@ best_distance_yet = 40000
 # We initialize the population.
 for i in range(POP_SIZE):
 	random_path_generator()
-counter = 0
 while True:
 	# We select the parents.
 	parent_i, parent_j = parents_selection()
@@ -194,6 +193,7 @@ while True:
 	if best.distance < best_distance_yet:
 		print("Best distance:", best.distance)
 		best_distance_yet = best.distance
+		counter = 0
 	if best.distance < 9000:
 		if counter >= STOP_ITER_NUMBER:
 			break
