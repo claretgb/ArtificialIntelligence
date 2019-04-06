@@ -6,18 +6,15 @@
 """
 
 # Imports and time count.
-from array import array
-from copy import copy
-from copy import deepcopy
+import matplotlib.pyplot as plt
 import random
 import math
-import time
-start = time.time()
 
 # Constants used in the code and global variables.
 NUMBER_OF_LOCATIONS = 52
-POP_SIZE = 50
+POP_SIZE = 40
 STOP_ITER_NUMBER = 1000
+CHILD_NUMBER = POP_SIZE//2
 locations = [] #type: list
 individuals = [] #type: list
 
@@ -59,11 +56,15 @@ class Individual:
 """
 def read_file():
 	global NUMBER_OF_LOCATIONS, locations
-	input_file = open("assignment3/genetic/berlin52.tsp", "r")
+	input_file = open("berlin52.tsp", "r")
 	for line in input_file:
 		split_line = line.split(" ")
 		locations.append(Location(int(split_line.pop(0)), float(split_line.pop(0)), float(split_line.pop(0))))
 
+"""
+	This method generates random paths 
+	to act as the initial population.
+"""
 def random_path_generator():
 	global individuals
 	path = [] #type: list
@@ -71,59 +72,55 @@ def random_path_generator():
 		path.append(i+1)
 	random.shuffle(path)
 	i = path.index(1)
-	aux = path[0]
-	path[0] = path[i]
-	path[i] = aux
+	path[i] = path[0]
+	path[0] = 1
 	individual = Individual(path)
 	individuals.append(individual)
 
+"""
+	This method calculates the total
+	distance of a path, going through every
+	location. It is my fitness function.
+"""
 def calculate_distance(path):
 	global locations
 	distance = 0
 	for i in range(NUMBER_OF_LOCATIONS):
+		location_i = locations[path.locations[i]-1]
 		if i == NUMBER_OF_LOCATIONS-1:
-			location_i = locations[i]
 			location_j = locations[0]
 		else:
-			location_i = locations[i]
-			location_j = locations[path.locations.index(i+2)]
+			location_j = locations[path.locations[i+1]-1]
 		inside = math.pow((location_j.coordinate_x - location_i.coordinate_x), 2) + math.pow((location_j.coordinate_y - location_i.coordinate_y), 2)
 		distance_i = math.sqrt(inside)
 		distance += distance_i
 	return distance
 
-def parents_selection():
-	index = 0
-	smallest = 40000
-	sec_smallest = 40000
-	max_index = 0
-	max2_index = 0
-	for path in individuals:
-		if path.distance < smallest:
-			smallest = path.distance
-			max_index = index
-		elif path.distance < sec_smallest:
-			sec_smallest = path.distance
-			max2_index = index
-		index += 1	
-	return individuals[max_index], individuals[max2_index]
+"""
+	This is an auxiliary function
+	in order to use the sort() method.
+"""
+def distance(element):
+	return element.distance
 
+"""
+	This method finds the worst individuals 
+	to kill them and replace them with the 
+	generated offspring.
+"""
 def find_worst_individuals():
-	index = 0
-	biggest = 0
-	sec_biggest = 0
-	min_index = 0
-	min2_index = 0
-	for path in individuals:
-		if path.distance > biggest:
-			biggest = path.distance
-			min_index = index
-		elif path.distance > sec_biggest:
-			sec_biggest = path.distance
-			min2_index = index
-		index += 1	
-	return min_index, min2_index
+	aux = [] #type: list
+	for i in individuals:
+		aux.append(i)
+	aux.sort(reverse = True, key = distance)
+	for i in range(POP_SIZE - CHILD_NUMBER):
+		aux.pop()
+	return aux
 
+"""
+	This method finds the best individual 
+	in the population to act as a parent.
+"""
 def select_best_individual():
 	index = 0
 	smallest = 40000
@@ -135,13 +132,25 @@ def select_best_individual():
 			index += 1
 	return individuals[max_index]
 
-def generate_offspring(parent_i, parent_j):
+"""
+	This method generates the offspring
+	using the best individual as a parent
+	and another individual also as a parent.
+"""
+def generate_offspring(parent_i):
 	global individuals
 	children = [] #type: list
-	for l in range(0,POP_SIZE//4):
+	for l in range(0,CHILD_NUMBER):
 		aux = [] #type: list
 		rand1 = random.randint(1,NUMBER_OF_LOCATIONS-2)
 		rand2 = random.randint(rand1,NUMBER_OF_LOCATIONS-1)
+		parent_j = parent_i
+		while parent_j == parent_i:
+			parent_j = individuals[random.randint(0, POP_SIZE-1)]
+		if random.random() < 0.5:
+			aux_par = parent_i
+			parent_i = parent_j
+			parent_j = aux_par
 		offspring_i = [] #type: list
 		for i in range(rand1, rand2):
 			aux.append(parent_i.locations[i])
@@ -150,32 +159,32 @@ def generate_offspring(parent_i, parent_j):
 				offspring_i.append(parent_j.locations[i])
 		for i in range(rand1, rand2):
 			offspring_i.insert(i, aux[i-rand1])
-		offspring_j = [] #type: list
-		aux = [] #type: list
-		rand1 = random.randint(1,NUMBER_OF_LOCATIONS-2)
-		rand2 = random.randint(rand1,NUMBER_OF_LOCATIONS-1)
-		for i in range(rand1, rand2):
-			aux.append(parent_i.locations[i])
-		for i in range(NUMBER_OF_LOCATIONS):
-			if parent_j.locations[i] not in aux:
-				offspring_j.append(parent_j.locations[i])
-		for i in range(rand1, rand2):
-			offspring_j.insert(i, aux[i-rand1])
-		index_worst, index_2worst = find_worst_individuals()
-		individuals[index_worst] = Individual(offspring_i)
-		individuals[index_2worst] = Individual(offspring_j)
-		children.append(index_worst)
-		children.append(index_2worst)
+		offspring = Individual(offspring_i)
+		children.append(offspring)
+	worst_indiv = find_worst_individuals()
+	for i in range(len(children)):
+		individuals[individuals.index(worst_indiv[i])] = children[i]
 	return children
 
+"""
+	This method mutates a random number
+	of children to avoid prematurity and 
+	increase diversity.
+"""
 def mutate_population(children):
 	global individuals
-	rand1 = random.randint(1,NUMBER_OF_LOCATIONS-1)
-	rand2 = random.randint(1,NUMBER_OF_LOCATIONS-1)
-	rand3 = random.randint(1,len(children)-1)
-	aux = individuals[children[rand3]].locations[rand1]
-	individuals[children[rand3]].locations[rand1] = individuals[children[rand3]].locations[rand2]
-	individuals[children[rand3]].locations[rand2] = aux
+	mutated = [] #type: list
+	rand3 = random.randint(1,len(children))
+	for j in range(rand3, len(children)):
+		if children[j] not in mutated:
+			for k in range(0,1):
+				rand1 = random.randint(1,NUMBER_OF_LOCATIONS-2)
+				rand2 = random.randint(rand1,NUMBER_OF_LOCATIONS-1)
+				difference = rand2 - rand1
+				for i in range(difference):
+					aux = children[j].locations[rand1+i]
+					children[j].locations[rand1+i] = children[j].locations[rand2-i]
+					children[j].locations[rand2-i] = aux
 
 # Main function.
 
@@ -184,24 +193,31 @@ best_distance_yet = 40000
 # We initialize the population.
 for i in range(POP_SIZE):
 	random_path_generator()
+distances = [] #type: list
+generations = 0
+grapth_gens = [] #type: list
 while True:
 	# We select the parents.
-	parent_i, parent_j = parents_selection()
-	children = generate_offspring(parent_i, parent_j)
+	parent_i = select_best_individual()
+	children = generate_offspring(parent_i)
 	mutate_population(children)
 	best = select_best_individual()
 	if best.distance < best_distance_yet:
-		print("Best distance:", best.distance)
+		print("Best distance:", best.distance, "Generation:", generations)
 		best_distance_yet = best.distance
+		distances.append(best_distance_yet)
+		grapth_gens.append(generations)
 		counter = 0
 	if best.distance < 9000:
 		if counter >= STOP_ITER_NUMBER:
 			break
 		counter += 1
+	generations += 1
 
+
+plt.plot(grapth_gens, distances)
+plt.xlabel('Generations')
+plt.ylabel('Distances')
+plt.show()
 print("This is the solution:")
 print(best.locations)
-
-print("Execution time:")
-end = time.time()
-print(end - start)
