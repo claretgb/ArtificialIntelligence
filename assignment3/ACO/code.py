@@ -14,16 +14,16 @@ import math
 # Constants used in the code and global variables.
 NUMBER_OF_LOCATIONS = 52
 # I repeat location 1 at the end of the file.
-NUMBER_OF_ANTS = 70
+NUMBER_OF_ANTS = 100
 PHEROMONES_INITIAL_VALUE = 10
 locations = [] #type: list
 tau = [] #type: list
 D = [] #type: list
-neta = [] #type: list
+eta = [] #type: list
 L = [] #type: list
-alpha = 0.65
-beta = 0.35
-p = 0.15
+alpha = 0.9
+beta = 1.2
+p = 0.95
 distances_paths = [] #type: list
 global_best_path = [] #type: list
 global_best_distance = 40000
@@ -76,12 +76,15 @@ def initialize_distances():
 	row = [] #type: list
 	for i in range(NUMBER_OF_LOCATIONS):
 		for j in range(NUMBER_OF_LOCATIONS):
-			row.append(distance_points(i, j))
+			if i == j:
+				row.append(math.inf)
+			else:
+				row.append(distance_points(i, j))
 		D.append(copy(row))
 		row.clear()
 
 def initialize_heuristic():
-	global neta, D
+	global eta, D
 	row = [] #type: list
 	for i in range(NUMBER_OF_LOCATIONS):
 		for j in range(NUMBER_OF_LOCATIONS):
@@ -90,7 +93,7 @@ def initialize_heuristic():
 				row.append(heuristic)
 			else:
 				row.append(0.0)
-		neta.append(copy(row))
+		eta.append(copy(row))
 		row.clear()
 
 def initialize_ants():
@@ -109,15 +112,15 @@ def transition_rule(k):
 	global L
 	transition_result = 0
 	possible_s = [] #type: list
-	location_r = L[k][-1]
+	location_r = L[k][-2]
 	probabilities = [] #type: list
 	sum = 0
 	for loc in range(NUMBER_OF_LOCATIONS):
 		if loc not in L[k]:
 			possible_s.append(loc)
-			sum += math.pow(tau[location_r][loc], alpha) * math.pow(neta[location_r][loc], beta)
+			sum += math.pow(tau[location_r][loc], alpha) * math.pow(eta[location_r][loc], beta)
 	for loc_s in possible_s:
-		top = math.pow(tau[location_r][loc_s], alpha) * math.pow(neta[location_r][loc_s], beta)
+		top = math.pow(tau[location_r][loc_s], alpha) * math.pow(eta[location_r][loc_s], beta)
 		division = top / sum
 		probabilities.append([loc_s, division])
 	# Roulette wheel.
@@ -134,6 +137,9 @@ def transition_rule(k):
 		if random_sum > random_selected:
 			transition_result = probabilities[i][0]
 			break
+	"""# Random between non visited cities.
+	rand = random.randint(0, len(probabilities)-1)
+	transition_result = probabilities[rand][0]"""
 	return transition_result
 
 def distance_points(i, j):
@@ -146,6 +152,7 @@ def distance_points(i, j):
 def calculate_distance_paths():
 	global L, distances_paths
 	best_distance = 40000
+	best_ant = 0
 	for k in range(NUMBER_OF_ANTS):
 		distance = 0
 		for i in range(len(L[k])-1):
@@ -154,7 +161,8 @@ def calculate_distance_paths():
 		if distance < best_distance:
 			best_distance = distance
 			best_path = L[k]
-	return best_distance, best_path
+			best_ant = k
+	return best_distance, best_path, best_ant
 
 def update_pheromones():
 	global p, L, distances_paths
@@ -166,6 +174,14 @@ def update_pheromones():
 					sum += 1/distances_paths[k]
 			tau[i][j] = (1-p)*tau[i][j] + sum
 
+def update_pheromones_best_ant(best_ant):
+	global p, L, distances_paths
+	for i in range(NUMBER_OF_LOCATIONS):
+		for j in range(NUMBER_OF_LOCATIONS):
+			sum = 0
+			if i in L[best_ant] and j == L[best_ant][L[best_ant].index(i)+1]:
+				sum += 1/distances_paths[best_ant]
+			tau[i][j] = (1-p)*tau[i][j] + sum
 
 # Main function.
 
@@ -178,11 +194,12 @@ iterations = 0
 while global_best_distance > 9000:
 	initialize_ants()
 	build_solution()
-	best_distance, best_path = calculate_distance_paths()
+	best_distance, best_path, best_ant = calculate_distance_paths()
+	update_pheromones()
 	if best_distance < global_best_distance:
 		global_best_distance = best_distance
 		print(global_best_distance)
 		global_best_path = best_path
-	update_pheromones()
+		update_pheromones_best_ant(best_ant)
 	iterations += 1
 print(global_best_path, global_best_distance)
