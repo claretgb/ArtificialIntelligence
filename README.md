@@ -22,4 +22,13 @@ After turning in the code, I have received a 5/5 mark.
 Part 1 consists of solving the travelling salesman problem using a Genetic Algorithm of our creation.
 We need to start in location 1 and go through the 52 locations in Berlin with the shortest route possible, 
 finishing also in location 1. 
-This assignment is still being developed.
+
+After turning in the code, I have received a 1/1 mark. Still waiting to receive the mark on the report.
+
+Part 2 consists of solving the same travelling salesman problem using an Ant Colony Optimization algorithm.
+We need to start in location 1 and go through the 52 locations in Berlin with the shortest route possible,
+finishing also in location 1.
+
+After turning in the code, I have received a ___ mark. Still waiting to receive the mark on the report.
+
+#Assignment 4. 
