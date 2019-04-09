@@ -9,6 +9,8 @@
 import matplotlib.pyplot as plt
 import random
 import math
+import time
+start = time.time()
 
 # Constants used in the code and global variables.
 NUMBER_OF_LOCATIONS = 52
@@ -185,6 +187,7 @@ def mutate_population(children):
 					aux = children[j].locations[rand1+i]
 					children[j].locations[rand1+i] = children[j].locations[rand2-i]
 					children[j].locations[rand2-i] = aux
+			mutated.append(children[j])
 
 # Main function.
 
@@ -215,9 +218,13 @@ while True:
 	generations += 1
 
 
-plt.plot(grapth_gens, distances)
+"""plt.plot(grapth_gens, distances)
 plt.xlabel('Generations')
 plt.ylabel('Distances')
-plt.show()
+plt.show()"""
 print("This is the solution:")
 print(best.locations)
+
+print("Execution time:")
+end = time.time()
+print(end - start)

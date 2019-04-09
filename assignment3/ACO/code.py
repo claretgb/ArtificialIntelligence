@@ -10,20 +10,22 @@ import matplotlib.pyplot as plt
 from copy import copy
 import random
 import math
+import time
+start = time.time()
 
 # Constants used in the code and global variables.
 NUMBER_OF_LOCATIONS = 52
 # I repeat location 1 at the end of the file.
-NUMBER_OF_ANTS = 100
+NUMBER_OF_ANTS = 200
 PHEROMONES_INITIAL_VALUE = 10
 locations = [] #type: list
 tau = [] #type: list
 D = [] #type: list
 eta = [] #type: list
 L = [] #type: list
-alpha = 0.9
-beta = 1.2
-p = 0.95
+alpha = 0.95
+beta = 1.5
+p = 0.9
 distances_paths = [] #type: list
 global_best_path = [] #type: list
 global_best_distance = 40000
@@ -190,6 +192,8 @@ initialize_pheromones()
 initialize_distances()
 initialize_heuristic()
 best_distance = 40000
+graph_generations = [] #type: list
+graph_distances = [] #type: list
 iterations = 0
 while global_best_distance > 9000:
 	initialize_ants()
@@ -199,7 +203,19 @@ while global_best_distance > 9000:
 	if best_distance < global_best_distance:
 		global_best_distance = best_distance
 		print(global_best_distance)
+		graph_distances.append(best_distance)
+		graph_generations.append(iterations)
 		global_best_path = best_path
 		update_pheromones_best_ant(best_ant)
 	iterations += 1
+
+"""plt.plot(graph_generations, graph_distances)
+plt.xlabel('Generations')
+plt.ylabel('Distances')
+plt.show()"""
+
 print(global_best_path, global_best_distance)
+
+print("Execution time:")
+end = time.time()
+print(end - start)
