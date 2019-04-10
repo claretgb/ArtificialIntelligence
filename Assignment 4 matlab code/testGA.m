@@ -5,7 +5,7 @@ functions = 1; %functions being solved
 %example: functions = 1;
 %example: functions = [2 4 9];
 numF = size(functions,2);
-nTimes = 1; % Number of times in which a function is going to be solved
+nTimes = 20; % Number of times in which a function is going to be solved
 dimension = 30; % Dimension of the problem
 populationSize = 100; % Adjust this to your algorithm
 
