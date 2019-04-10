@@ -1,13 +1,13 @@
 path = '/Users/clara/Documents/GitHub/ArtificialIntelligence/Assignment 4 matlab code/';
 addpath(genpath(path))
 
-functions = [1 2 3 4 5 6 7 8 9 10]; %functions being solved
+functions = 1; %functions being solved
 %example: functions = 1;
 %example: functions = [2 4 9];
 numF = size(functions,2);
-nTimes = 20; % Number of times in which a function is going to be solved
+nTimes = 1; % Number of times in which a function is going to be solved
 dimension = 30; % Dimension of the problem
-populationSize = 10; % Adjust this to your algorithm
+populationSize = 100; % Adjust this to your algorithm
 
 for i = 1:numF
     
@@ -35,58 +35,90 @@ for i = 1:numF
         populationFitness = calculateFitnessPopulation_2005(fitfun, population, o, A, M, a, alpha, b); %Fitness values of all individuals (smaller value is better)
         bestSolutionFitness = min(populationFitness);
         currentEval = currentEval + populationSize;
+        globalFitness = bestSolutionFitness;
+        g = 1; 
         
         % Algorithm loop
         
         while(objetiveValue < bestSolutionFitness && currentEval < maxEval)
             
-            % Your algorithm goes here
+%             % Your algorithm goes here
+%             
+%             % Select parents and create offspring.
+%             indexBest = 0;
+%             x = 0;
+%             while(x ~= bestSolutionFitness)
+%                 indexBest = indexBest + 1;
+%                 x = populationFitness(indexBest);
+%             end
+%             parentI = population(indexBest,:);
+%             indexSecondBest = 0;
+%             y = 0;
+%             bestSoFar = 0;
+%             for indexPop = 1:10
+%                 indexSecondBest = indexSecondBest + 1;
+%                 y = populationFitness(indexSecondBest);
+%                 if(y > bestSolutionFitness)
+%                     if(y < bestSoFar)
+%                         bestSoFar = y;
+%                     end
+%                 end
+%             end
+%             parentJ = population(indexSecondBest,:);
+%             newPopulation = zeros(populationSize, dimension);
+%             for inx = 1:9
+%                 firstLimit = int8(1 + ((dimension-1)-1).*rand);
+%                 secondLimit = int8(1 + ((dimension-firstLimit-1)-1).*rand) + firstLimit;
+%                 auxArray = zeros(1,secondLimit-firstLimit);
+%                 for index2 = firstLimit:secondLimit
+%                     auxArray(1,index2-firstLimit+1) = parentI(1,index2);
+%                 end
+%                 child = zeros(1,dimension);
+%                 counter = 1;
+%                 for index3 = 1:dimension
+%                     truthValue = ismember(parentJ(index3), auxArray);
+%                     if(~truthValue)
+%                         child(counter) = parentJ(index3);
+%                         counter = counter+1;
+%                     end
+%                 end
+%                 for index4 = firstLimit:secondLimit
+%                     child(index4) = auxArray(index4-firstLimit+1);
+%                 end
+%                 newPopulation(inx,:) = child;
+%             end
+%             newPopulation(10,:) = parentI;
+%             population = newPopulation;
+
+
+
+
+
+
+   % Your algorithm goes here
             
             % Select parents and create offspring.
-            indexBest = 0;
-            x = 0;
-            while(x ~= bestSolutionFitness)
-                indexBest = indexBest + 1;
-                x = populationFitness(indexBest);
-            end
+            [~,indexBest] = min(populationFitness);
+            
             parentI = population(indexBest,:);
-            indexSecondBest = 0;
-            y = 0;
-            bestSoFar = 0;
-            for indexPop = 1:10
-                indexSecondBest = indexSecondBest + 1;
-                y = populationFitness(indexSecondBest);
-                if(y > bestSolutionFitness)
-                    if(y < bestSoFar)
-                        bestSoFar = y;
-                    end
-                end
-            end
-            parentJ = population(indexSecondBest,:);
             newPopulation = zeros(populationSize, dimension);
-            for inx = 1:9
-                firstLimit = int8(1 + ((dimension-1)-1).*rand);
-                secondLimit = int8(1 + ((dimension-firstLimit-1)-1).*rand) + firstLimit;
-                auxArray = zeros(1,secondLimit-firstLimit);
-                for index2 = firstLimit:secondLimit
-                    auxArray(1,index2-firstLimit+1) = parentI(1,index2);
-                end
+            for inx = 1:populationSize-1
+                parentJ = population(inx+1,:);
                 child = zeros(1,dimension);
-                counter = 1;
-                for index3 = 1:dimension
-                    truthValue = ismember(parentJ(index3), auxArray);
-                    if(~truthValue)
-                        child(counter) = parentJ(index3);
-                        counter = counter+1;
-                    end
-                end
-                for index4 = firstLimit:secondLimit
-                    child(index4) = auxArray(index4-firstLimit+1);
+                for indexChild = 1:dimension
+                    child(indexChild) = (parentI(indexChild) + parentJ(indexChild))/2;
                 end
                 newPopulation(inx,:) = child;
             end
             newPopulation(10,:) = parentI;
             population = newPopulation;
+
+
+
+
+
+
+
             
             % Mutate offspring.
             
@@ -108,6 +140,12 @@ for i = 1:numF
             populationFitness = calculateFitnessPopulation_2005(fitfun, population, o, A, M, a, alpha, b); %Fitness values of all individuals (smaller value is better)
             bestSolutionFitness = min(populationFitness);
             currentEval = currentEval + populationSize;
+            if bestSolutionFitness < globalFitness
+                globalFitness = bestSolutionFitness;
+                fprintf('GlobalFitness: %d, Generations: %d\n', globalFitness, g);
+            end
+            
+            g = g + 1;
             
             % Your algorithm goes here
             

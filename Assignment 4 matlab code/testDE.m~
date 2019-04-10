@@ -7,8 +7,9 @@ functions = [1 2 3 4 5 6 7 8 9 10]; %functions being solved
 numF = size(functions,2);
 nTimes = 20; % Number of times in which a function is going to be solved
 dimension = 30; % Dimension of the problem
-probabilityRecombination = 0.7     
-populationSize = 50; % Adjust this to your algorithm
+probabilityRecombination = 0.2;     
+mutationF = 0.9; % F in [0,2]
+populationSize = 2500; % Adjust this to your algorithm
 
 for i = 1:numF
     
@@ -48,12 +49,17 @@ for i = 1:numF
            
             mutatedPopulation = population; %zeros(populationSize, dimension);
             for indexMutation = 1:populationSize
-                rand1 = int8(1 + (dimension-1).*rand);
-                rand2 = int8(1 + (dimension-1).*rand);
-                mutant = mutatedPopulation(indexMutation,:);
-                auxMutation = mutant(rand1);
-                mutant(rand1) = mutant(rand2);
-                mutant(rand2) = auxMutation;
+                rand1 = int8(1 + (populationSize-1).*rand);
+                rand2 = rand1;
+                while(rand2 == rand1)
+                    rand2 = int8(1 + (populationSize-1).*rand);
+                end
+                rand3 = rand2;
+                while(rand3 == rand2 or r)
+                    rand2 = int8(1 + (populationSize-1).*rand);
+                end
+                rand3 = int8(1 + (populationSize-1).*rand);
+                
             end
             
             % Recombination.
@@ -63,19 +69,15 @@ for i = 1:numF
             for indexOffspring = 1:populationSize
                 if(randomValue < probabilityRecombination)
                     offspring(indexOffspring) = mutatedPopulation(indexOffspring);
-                else
-                    offspring(indexOffspring) = population(indexOffspring);
                 end
             end
             
             % Selection.
             
-            newPopulation = population%zeros(populationSize, dimension);
+            newPopulation = population; %zeros(populationSize, dimension);
             offspringFitness = calculateFitnessPopulation_2005(fitfun, offspring, o, A, M, a, alpha, b); %Fitness values of all individuals (smaller value is better)
             for indexNewPopulation = 1:populationSize
                 if(populationFitness(indexNewPopulation) > offspringFitness(indexNewPopulation))
-                    newPopulation(indexNewPopulation) = population(indexNewPopulation);
-                else
                     newPopulation(indexNewPopulation) = offspring(indexNewPopulation);
                 end
             end

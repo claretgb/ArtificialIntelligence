@@ -56,7 +56,7 @@ class Location:
 """
 def read_file():
 	global NUMBER_OF_LOCATIONS, locations
-	input_file = open("assignment3/ACO/berlin52.tsp", "r")
+	input_file = open("berlin52.tsp", "r")
 	for line in input_file:
 		split_line = line.split(" ")
 		locations.append(Location(int(split_line.pop(0)), float(split_line.pop(0)), float(split_line.pop(0))))
@@ -139,9 +139,6 @@ def transition_rule(k):
 		if random_sum > random_selected:
 			transition_result = probabilities[i][0]
 			break
-	"""# Random between non visited cities.
-	rand = random.randint(0, len(probabilities)-1)
-	transition_result = probabilities[rand][0]"""
 	return transition_result
 
 def distance_points(i, j):
@@ -206,13 +203,13 @@ while global_best_distance > 9000:
 		graph_distances.append(best_distance)
 		graph_generations.append(iterations)
 		global_best_path = best_path
-		update_pheromones_best_ant(best_ant)
+	update_pheromones_best_ant(best_ant)
 	iterations += 1
 
-"""plt.plot(graph_generations, graph_distances)
+plt.plot(graph_generations, graph_distances)
 plt.xlabel('Generations')
 plt.ylabel('Distances')
-plt.show()"""
+plt.show()
 
 print(global_best_path, global_best_distance)
 

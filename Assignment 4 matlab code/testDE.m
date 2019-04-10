@@ -1,15 +1,15 @@
 path = '/Users/clara/Documents/GitHub/ArtificialIntelligence/Assignment 4 matlab code/';
 addpath(genpath(path))
 
-functions = [1 2 3 4 5 6 7 8 9 10]; %functions being solved
+functions = 1; %functions being solved
 %example: functions = 1;
 %example: functions = [2 4 9];
 numF = size(functions,2);
-nTimes = 20; % Number of times in which a function is going to be solved
+nTimes = 1; % Number of times in which a function is going to be solved
 dimension = 30; % Dimension of the problem
-probabilityRecombination = 0.2;     
-mutationF = 0.9; % F in [0,2]
-populationSize = 2500; % Adjust this to your algorithm
+probabilityRecombination = 0.5;     
+mutationF = 0.5; % F in [0,2]
+populationSize = 100; % Adjust this to your algorithm
 
 for i = 1:numF
     
@@ -37,6 +37,8 @@ for i = 1:numF
         populationFitness = calculateFitnessPopulation_2005(fitfun, population, o, A, M, a, alpha, b); %Fitness values of all individuals (smaller value is better)
         bestSolutionFitness = min(populationFitness);
         currentEval = currentEval + populationSize;
+        globalFitness = bestSolutionFitness;
+        g = 1;
         
         % Algorithm loop
         
@@ -49,12 +51,16 @@ for i = 1:numF
            
             mutatedPopulation = population; %zeros(populationSize, dimension);
             for indexMutation = 1:populationSize
-                rand1 = int8(1 + (dimension-1).*rand);
-                rand2 = int8(1 + (dimension-1).*rand);
-                mutant = mutatedPopulation(indexMutation,:);
-                auxMutation = mutant(rand1);
-                mutant(rand1) = mutant(rand2);
-                mutant(rand2) = auxMutation;
+                rand1 = int8(1 + (populationSize-1).*rand);
+                rand2 = rand1;
+                while(rand2 == rand1)
+                    rand2 = int8(1 + (populationSize-1).*rand);
+                end
+                rand3 = rand2;
+                while(rand3 == rand2 || rand3 == rand1)
+                    rand3 = int8(1 + (populationSize-1).*rand);
+                end
+                mutatedPopulation(indexMutation,randGene) = population(rand1) + mutationF*(population(rand2)-population(rand3));
             end
             
             % Recombination.
@@ -84,6 +90,12 @@ for i = 1:numF
             populationFitness = calculateFitnessPopulation_2005(fitfun, population, o, A, M, a, alpha, b); %Fitness values of all individuals (smaller value is better)
             bestSolutionFitness = min(populationFitness);
             currentEval = currentEval + populationSize;
+            if bestSolutionFitness < globalFitness
+                globalFitness = bestSolutionFitness;
+                fprintf('GlobalFitness: %d, Generations: %d\n', globalFitness, g);
+            end
+            
+            g = g + 1;
             
             % Your algorithm goes here
             
