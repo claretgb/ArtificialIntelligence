@@ -1,7 +1,7 @@
 path = '/Users/clara/Documents/GitHub/ArtificialIntelligence/Assignment 4 matlab code/';
 addpath(genpath(path))
 
-functions = 1; %functions being solved
+functions = [1 2 3 4 5 6 7 8 9 10]; %functions being solved
 %example: functions = 1;
 %example: functions = [2 4 9];
 numF = size(functions,2);
@@ -16,6 +16,8 @@ for i = 1:numF
     fitfun = functions(i); %fitfun is the function that we are solving
     
     fprintf('\n-----  Function %d started  -----\n\n', fitfun);
+    
+    arrayForMean = zeros(1,nTimes);
     
     for t = 1:nTimes
         
@@ -48,42 +50,34 @@ for i = 1:numF
             
             % Select parents and create offspring.
             % Mutate offspring.
-           
-            mutatedPopulation = population; %zeros(populationSize, dimension);
+            
+            mutatedPopulation = zeros(populationSize,dimension);
             for indexMutation = 1:populationSize
-                rand1 = int8(1 + (populationSize-1).*rand);
-                rand2 = rand1;
-                while(rand2 == rand1)
-                    rand2 = int8(1 + (populationSize-1).*rand);
-                end
-                rand3 = rand2;
-                while(rand3 == rand2 || rand3 == rand1)
-                    rand3 = int8(1 + (populationSize-1).*rand);
-                end
-                mutatedPopulation(indexMutation,randGene) = population(rand1) + mutationF*(population(rand2)-population(rand3));
+                rands = randi([1, populationSize], 3, 1);
+                mutatedPopulation(indexMutation,:) = population(rands(1),:) + mutationF*(population(rands(2),:)-population(rands(3),:));
             end
             
             % Recombination.
             
-            offspring = population; %zeros(populationSize, dimension);
-            randomValue = rand;
+            offspring = population;
             for indexOffspring = 1:populationSize
+                randomValue = rand;
                 if(randomValue < probabilityRecombination)
-                    offspring(indexOffspring) = mutatedPopulation(indexOffspring);
+                    offspring(indexOffspring,:) = mutatedPopulation(indexOffspring,:);
+                else
+                    jrand = randi(dimension);
+                    offspring(indexOffspring,jrand) = mutatedPopulation(indexOffspring,jrand);
                 end
             end
             
             % Selection.
             
-            newPopulation = population; %zeros(populationSize, dimension);
             offspringFitness = calculateFitnessPopulation_2005(fitfun, offspring, o, A, M, a, alpha, b); %Fitness values of all individuals (smaller value is better)
             for indexNewPopulation = 1:populationSize
-                if(populationFitness(indexNewPopulation) > offspringFitness(indexNewPopulation))
-                    newPopulation(indexNewPopulation) = offspring(indexNewPopulation);
+                if(offspringFitness(indexNewPopulation) < populationFitness(indexNewPopulation))
+                    population(indexNewPopulation,:) = offspring(indexNewPopulation,:);
                 end
             end
-            
-            population = newPopulation;
             
             % Your algorithm stops here
             
@@ -92,7 +86,7 @@ for i = 1:numF
             currentEval = currentEval + populationSize;
             if bestSolutionFitness < globalFitness
                 globalFitness = bestSolutionFitness;
-                fprintf('GlobalFitness: %d, Generations: %d\n', globalFitness, g);
+                %fprintf('GlobalFitness: %d, Generations: %d\n', globalFitness, g);
             end
             
             g = g + 1;
@@ -108,7 +102,7 @@ for i = 1:numF
         % best individual
         bestSolutionFitness = min(populationFitness);
         fprintf('%dth run, The best individual fitness is %d\n', t, bestSolutionFitness);
-        
+        arrayForMean(t) = bestSolutionFitness;
     end
-    
+    fprintf('Mean: %d\n', mean(arrayForMean));
 end
