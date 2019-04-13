@@ -1,17 +1,16 @@
 path = '/Users/clara/Documents/GitHub/ArtificialIntelligence/Assignment 4 matlab code/';
 addpath(genpath(path))
 
-%functions = [1 2 3 4 5 6 7 8 9 10]; %functions being solved
-%example: 
-functions = 1;
+functions = [1 2 3 4 5 6 7 8 9 10]; %functions being solved
+%example: functions = 1;
 %example: functions = [2 4 9];
 numF = size(functions,2);
 nTimes = 20; % Number of times in which a function is going to be solved
 dimension = 30; % Dimension of the problem
-populationSize = 100; % Adjust this to your algorithm
-alp = 0.1;
-delta = 0.005;
-mutationProbability = 0.4;
+populationSize = 20; % Adjust this to your algorithm
+alp = 0.25;
+delta = 0.15;
+mutationProbability = 0.1;
 numberOfParticipants = int8(populationSize/4);
 
 for i = 1:numF
@@ -50,73 +49,37 @@ for i = 1:numF
         while(objetiveValue < bestSolutionFitness && currentEval < maxEval)
             
             % Your algorithm goes here
-            
+
+            % Select parents and create offspring.
+            [~,indexBest] = min(populationFitness);
+            parentI = population(indexBest,:);
             offspring = zeros(populationSize, dimension);
-            intermediate = zeros(populationSize, dimension);
-            newPopulation = zeros(populationSize, dimension);
-            for halfNumberOfChildren = 1:2:populationSize
-                % Choose participants.
-                participants = randi([1,populationSize],1,numberOfParticipants);
-                % Select two best.
-                parents = [];
-                [~, sortedIndexes] = sort(populationFitness);
-                for indexSorted = 1:populationSize
-                    if ismember(sortedIndexes(indexSorted), participants)
-                        indexPop = sortedIndexes(indexSorted);
-                        indexParents = length(parents)+1;
-                        parents(indexParents,:) = population(indexPop,:);
-                    end
-                    if length(parents) == 2
-                        break
-                    end
+            for halfNumberOfChildren = 1:populationSize
+                child = zeros(1,dimension);
+                indexParentJ = indexBest;
+                while indexParentJ == indexBest
+                    indexParentJ = int8(1+(populationSize-1).*rand);
                 end
-                child1 = zeros(1,dimension);
+                parentJ = population(indexParentJ,:);
                 for indexCrossover = 1:dimension
-                    minFrame = min(parents(1,indexCrossover), parents(2,indexCrossover));
-                    maxFrame = max(parents(1,indexCrossover), parents(2,indexCrossover));
+                    minFrame = min(parentI(indexCrossover), parentJ(indexCrossover));
+                    maxFrame = max(parentI(indexCrossover), parentJ(indexCrossover));
                     difference = maxFrame - minFrame;
                     randGene = ((maxFrame+difference*alp)-(minFrame-difference*alp)).*rand + (minFrame-difference*alp);
-                    child1(indexCrossover) = randGene;
+                    child(indexCrossover) = randGene;
                 end
-                intermediate(halfNumberOfChildren,:) = child1;
-                randomProbability = rand;
-                if randomProbability < mutationProbability
-                    for indexMutation = 1:dimension
-                        offspring(halfNumberOfChildren,indexMutation) = intermediate(halfNumberOfChildren,indexMutation) + sqrt(delta)*randn(1);
-                    end
-                end
-                child1Fitness = calculateFitness_2005(fitfun, offspring(halfNumberOfChildren,:), o, A, M, a, alpha, b);
-                child2 = zeros(1,dimension);
-                for indexCrossover = 1:dimension
-                    minFrame = min(parents(1,indexCrossover), parents(2,indexCrossover));
-                    maxFrame = max(parents(1,indexCrossover), parents(2,indexCrossover));
-                    difference = maxFrame - minFrame;
-                    randGene = ((maxFrame+difference*alp)-(minFrame-difference*alp)).*rand + (minFrame-difference*alp);
-                    child2(indexCrossover) = randGene;
-                end
-                intermediate(halfNumberOfChildren+1,:) = child2;
-                randomProbability = rand;
-                if randomProbability < mutationProbability
-                    for indexMutation = 1:dimension
-                        offspring(halfNumberOfChildren+1,indexMutation) = intermediate(halfNumberOfChildren+1,indexMutation) + sqrt(delta)*randn(1);
-                    end
-                end
-                child2Fitness = calculateFitness_2005(fitfun, offspring(halfNumberOfChildren+1,:), o, A, M, a, alpha, b);
-                toSortArray = zeros(1,4);
-                toSortArray(1,1) = child1Fitness;
-                toSortArray(1,2) = child2Fitness;
-                toSortArray(1,3) = populationFitness(sortedIndexes(1));
-                toSortArray(1,4) = populationFitness(sortedIndexes(2));
-                [~, ind] = sort(toSortArray);
-                elementsArray = zeros(4,dimension);
-                elementsArray(1,:) = child1;
-                elementsArray(2,:) = child2;
-                elementsArray(3,:) = parents(1);
-                elementsArray(4,:) = parents(2);
-                newPopulation(halfNumberOfChildren,:) = elementsArray(ind(1),:);
-                newPopulation(halfNumberOfChildren+1,:) = elementsArray(ind(2),:);
+                offspring(halfNumberOfChildren,:) = child;
             end
-            population = newPopulation;
+            for indexMutation = 1:populationSize
+                randomProbability = rand;
+                if randomProbability < mutationProbability
+                    if indexMutation ~= indexBest
+                        for indexMutation2 = 1:dimension
+                            population(indexMutation,indexMutation2) = offspring(indexMutation,indexMutation2) + sqrt(delta)*randn(1);
+                        end
+                    end
+                end
+            end
             
             % Your algorithm stops here
             
@@ -125,7 +88,7 @@ for i = 1:numF
             currentEval = currentEval + populationSize;
             if bestSolutionFitness < globalFitness
                 globalFitness = bestSolutionFitness;
-                fprintf('GlobalFitness: %d, Generations: %d\n', globalFitness, g);
+                %fprintf('GlobalFitness: %d, Generations: %d\n', globalFitness, g);
             end
             
             g = g + 1;
