@@ -16,7 +16,11 @@ PERCENTAGE_TRAINING = 0.70
 PERCENTAGE_VALIDATION = 0.80
 PERCENTAGE_TESTING = 1.0
 LABEL_SOLVED = 0
-neurons = [] #type: list
+NUMBER_NEURONS_FHL = 20
+NUMBER_NEURONS_OL = 10
+LEARNING_RATE = 0.1 
+neurons_hidden_layer = [] #type: list
+neurons_output_layer = [] #type: list
 
 
 """
@@ -36,16 +40,23 @@ class Image:
 	about the different neurons.
 """
 class Neuron:
+	inputs = [] #type: list
+	weights = [] #type: list
 	output = 0
 
-	def __init__(self, inputs, weights):
+	def __init__(self, inputs, weights, output):
+		self.inputs = inputs
+		self.weights = weights
 		net = self.calculate_net(inputs, weights)
-		output = self.calculate_sigmoid(net)
+		if output == 1:
+			output = self.calculate_sigmoid(net)
+		else:
+			output = self.calculate_sign(net)
 		self.output = output
 	
 	def calculate_net(self, inputs, weights):
 		net = weights[0]
-		for i in range(IMAGE_SIZE):
+		for i in range(len(inputs)):
 			net += inputs[i]*weights[i+1]
 		return net
 
@@ -54,6 +65,13 @@ class Neuron:
 		net = -net
 		sigmoid = 1+math.exp(net)
 		return 1/sigmoid
+
+	def calculate_sign(self, net):
+		if net > 0:
+			sign = 1
+		else:
+			sign = -1
+		return sign
 
 
 """
@@ -83,6 +101,74 @@ def read_file():
 		break
 	return training_set, validation_set, testing_set
 
+def random_weight_generator(number_of_weights):
+	weights = [] #type: list
+	for i in range(number_of_weights):
+		weights.append(random.uniform(-1,1))
+	return weights
+
+def learning_rule():
+	return None
+
 # Main function.
 
 training_set, validation_set, testing_set = read_file()
+for i in range(NUMBER_NEURONS_FHL):
+	weights = random_weight_generator(IMAGE_SIZE+1)
+	neurons_hidden_layer.append(Neuron(training_set[0].pixels, weights, 0))
+for neuron in neurons_hidden_layer:
+	print(neuron.output)
+print()
+
+inputs_output_layer = [] #type: list
+for neuron in neurons_hidden_layer:
+	inputs_output_layer.append(neuron.output)
+
+for i in range(NUMBER_NEURONS_OL):
+	weights = random_weight_generator(NUMBER_NEURONS_FHL+1)
+	neurons_output_layer.append(Neuron(inputs_output_layer, weights, 1))
+for neuron in neurons_output_layer:
+	print(neuron.output)
+print()
+
+sum = 0.0
+softmax_elem = [] #type: list
+for neuron_output in neurons_output_layer:
+	softmax_elem.append(math.exp(neuron_output.output))
+	sum += math.exp(neuron_output.output)
+
+for i in range(len(softmax_elem)):
+	softmax_elem[i] = softmax_elem[i]/sum
+
+output = softmax_elem.index(max(softmax_elem))
+print("Output =", output)
+
+# Creating target array.
+
+t = [0,0,0,0,0,0,0,0,0,0] #type: list
+t[training_set[0].label] = 1
+print(t)
+
+error_output = [] #type: list
+for i in range(NUMBER_NEURONS_OL):
+	error_output.append((t[i]-neurons_output_layer[i].output)*neurons_output_layer[i].output*(1-neurons_output_layer[i].output))
+print(error_output)
+
+for index,neuron in enumerate(neurons_output_layer):
+	neuron.weights[0] = LEARNING_RATE*error_output[index]
+	for i in range(NUMBER_NEURONS_FHL):
+		neuron.weights[i] += LEARNING_RATE*error_output[index]*neuron.inputs[i]
+
+error_hidden = [] #type: list
+for i in range(NUMBER_NEURONS_FHL):
+	sum = 0
+	for j in range(NUMBER_NEURONS_OL):
+		sum += error_output[j]*neurons_output_layer[j].weights[i+1]
+	error_hidden.append((1-neurons_hidden_layer[i].output)*neurons_hidden_layer[i].output*sum)
+print(error_hidden)
+
+for index,neuron in enumerate(neurons_hidden_layer):
+	neuron.weights[0] = LEARNING_RATE*error_hidden[index]
+	for i in range(IMAGE_SIZE):
+		aux = LEARNING_RATE*error_hidden[index]*neuron.inputs[i]
+		neuron.weights[i] += aux
