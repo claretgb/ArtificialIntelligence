@@ -116,66 +116,88 @@ training_set, validation_set, testing_set = read_file()
 
 initialize_neurons()
 
-for training_example in training_set:
-	for neuron in neurons_hidden_layer:
-		neuron.inputs = training_example.pixels
-		neuron.calculate_output()
+learned = False
+print("Let's start training!")
+rounds = 0
+while learned == False:
+	print("Round", rounds)
+	learned = False
+	failed = False
+	counter = 0
+	counter_success = 0
+	for training_example in training_set:
+		for neuron in neurons_hidden_layer:
+			neuron.inputs = training_example.pixels
+			neuron.calculate_output()
 
-	inputs_output_layer = [] #type: list
-	for neuron in neurons_hidden_layer:
-		inputs_output_layer.append(neuron.output)
+		inputs_output_layer = [] #type: list
+		for neuron in neurons_hidden_layer:
+			inputs_output_layer.append(neuron.output)
 
-	for neuron in neurons_output_layer:
-		neuron.inputs = inputs_output_layer
-		neuron.calculate_output()
+		for neuron in neurons_output_layer:
+			neuron.inputs = inputs_output_layer
+			neuron.calculate_output()
 
-	# Softmax.
+		# Softmax.
 
-	sum = 0.0
-	softmax_elem = [] #type: list
-	for neuron_output in neurons_output_layer:
-		softmax_elem.append(math.exp(neuron_output.output))
-		sum += math.exp(neuron_output.output)
+		sum = 0.0
+		softmax_elem = [] #type: list
+		for neuron_output in neurons_output_layer:
+			softmax_elem.append(math.exp(neuron_output.output))
+			sum += math.exp(neuron_output.output)
 
-	for i in range(len(softmax_elem)):
-		softmax_elem[i] = softmax_elem[i]/sum
+		for i in range(len(softmax_elem)):
+			softmax_elem[i] = softmax_elem[i]/sum
 
-	output = softmax_elem.index(max(softmax_elem))
-	print("Output =", output)
+		output = softmax_elem.index(max(softmax_elem))
+		#print("Output =", output, "Expected =", training_example.label)
 
-	# Creating target array.
+		if output != training_example.label:
+			failed = True
+		else: 
+			counter_success += 1
 
-	t = [0] * NUMBER_NEURONS_OL #type: list
-	t[training_example.label] = 1
-	print(t)
+		# Creating target array.
 
-	error_output = [] #type: list
-	for i in range(NUMBER_NEURONS_OL):
-		error_output.append((t[i]-neurons_output_layer[i].output)*neurons_output_layer[i].output*(1-neurons_output_layer[i].output))
+		t = [0] * NUMBER_NEURONS_OL #type: list
+		t[training_example.label] = 1
 
-	for index,neuron in enumerate(neurons_output_layer):
-		neuron.weights[0] = LEARNING_RATE*error_output[index]
+		error_output = [] #type: list
+		for i in range(NUMBER_NEURONS_OL):
+			error_output.append((t[i]-neurons_output_layer[i].output)*neurons_output_layer[i].output*(1-neurons_output_layer[i].output))
+
+		for index,neuron in enumerate(neurons_output_layer):
+			neuron.weights[0] = LEARNING_RATE*error_output[index]
+			for i in range(NUMBER_NEURONS_FHL):
+				aux = LEARNING_RATE*error_output[index]*neuron.inputs[i]
+				neuron.weights[i] += aux
+
+		error_hidden = [] #type: list
 		for i in range(NUMBER_NEURONS_FHL):
-			aux = LEARNING_RATE*error_output[index]*neuron.inputs[i]
-			neuron.weights[i] += aux
+			sum = 0
+			for j in range(NUMBER_NEURONS_OL):
+				sum += error_output[j]*neurons_output_layer[j].weights[i+1]
+			error_hidden.append((1-neurons_hidden_layer[i].output)*neurons_hidden_layer[i].output*sum)
 
-	error_hidden = [] #type: list
-	for i in range(NUMBER_NEURONS_FHL):
-		sum = 0
-		for j in range(NUMBER_NEURONS_OL):
-			sum += error_output[j]*neurons_output_layer[j].weights[i+1]
-		error_hidden.append((1-neurons_hidden_layer[i].output)*neurons_hidden_layer[i].output*sum)
-
-	for index,neuron in enumerate(neurons_hidden_layer):
-		neuron.weights[0] = LEARNING_RATE*error_hidden[index]
-		for i in range(IMAGE_SIZE):
-			aux = LEARNING_RATE*error_hidden[index]*neuron.inputs[i]
-			neuron.weights[i] += aux
+		for index,neuron in enumerate(neurons_hidden_layer):
+			neuron.weights[0] = LEARNING_RATE*error_hidden[index]
+			for i in range(IMAGE_SIZE):
+				aux = LEARNING_RATE*error_hidden[index]*neuron.inputs[i]
+				neuron.weights[i] += aux
+		counter += 1
+		
+	if failed == False:
+		learned = True
+		print("LEARNED!")
+	else:
+		print("Failed. Trying again :(")
+		print("Success rate:", counter_success/counter)
+	rounds += 1
 
 for validation_example in validation_set:
 	for neuron in neurons_hidden_layer:
-		neuron.inputs = training_example.pixels
-		neuron.calculate_output(0)
+		neuron.inputs = validation_example.pixels
+		neuron.calculate_output()
 
 	inputs_output_layer.clear()
 	for neuron in neurons_hidden_layer:
@@ -183,7 +205,7 @@ for validation_example in validation_set:
 
 	for neuron in neurons_output_layer:
 		neuron.inputs = inputs_output_layer
-		neuron.calculate_output(1)
+		neuron.calculate_output()
 
 	# Softmax.
 
@@ -232,8 +254,8 @@ counter = 0
 counter_success = 0
 for testing_example in testing_set:
 	for neuron in neurons_hidden_layer:
-		neuron.inputs = training_example.pixels
-		neuron.calculate_output(0)
+		neuron.inputs = testing_example.pixels
+		neuron.calculate_output()
 
 	inputs_output_layer.clear()
 	for neuron in neurons_hidden_layer:
@@ -241,7 +263,7 @@ for testing_example in testing_set:
 
 	for neuron in neurons_output_layer:
 		neuron.inputs = inputs_output_layer
-		neuron.calculate_output(1)
+		neuron.calculate_output()
 
 	# Softmax.
 

@@ -51,6 +51,26 @@ for i = 1:numF
             % Your algorithm goes here
 
             % Select parents and create offspring.
+            sum = 0;
+            for ind = 1:populationSize
+                sum = sum + populationFitness(ind);
+            end
+            roulette = zeros(1,populationSize);
+            for ind = 1:populationSize
+                roulette(ind) = populationFitness(ind)/sum;
+            end
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
             [~,indexBest] = min(populationFitness);
             parentI = population(indexBest,:);
             offspring = zeros(populationSize, dimension);
