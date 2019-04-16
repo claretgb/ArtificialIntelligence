@@ -9,7 +9,7 @@ nTimes = 20; % Number of times in which a function is going to be solved
 dimension = 30; % Dimension of the problem
 populationSize = 200; % Adjust this to your algorithm
 Vmax = 1.5; % Maximum movement that the particle will take in every generation.
-phy1 = 2;
+phy1 = 0.05;
 phy2 = 2;
 
 for i = 1:numF

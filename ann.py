@@ -17,10 +17,23 @@ PERCENTAGE_TRAINING = 0.70
 PERCENTAGE_VALIDATION = 0.80
 PERCENTAGE_TESTING = 1.0
 NUMBER_NEURONS_FHL = 20
+NUMBER_NEURONS_SHL = 15
 NUMBER_NEURONS_OL = 10
 LEARNING_RATE = 0.1 
-neurons_hidden_layer = [] #type: list
-neurons_output_layer = [] #type: list
+inputs_FHL = np.zeros((NUMBER_NEURONS_FHL,IMAGE_SIZE))
+weights_FHL = np.zeros((NUMBER_NEURONS_FHL,IMAGE_SIZE+1))
+outputs_FHL = np.zeros((1,NUMBER_NEURONS_FHL))
+inputs_SHL = np.zeros((NUMBER_NEURONS_SHL,NUMBER_NEURONS_FHL))
+weights_SHL = np.zeros((NUMBER_NEURONS_SHL,NUMBER_NEURONS_FHL+1))
+outputs_SHL = np.zeros((1,NUMBER_NEURONS_SHL))
+inputs_OL = np.zeros((NUMBER_NEURONS_OL,NUMBER_NEURONS_SHL))
+weights_OL = np.zeros((NUMBER_NEURONS_OL,NUMBER_NEURONS_SHL+1))
+outputs_OL = np.zeros((1,NUMBER_NEURONS_OL))
+error_FHL = np.zeros((1,NUMBER_NEURONS_FHL))
+error_SHL = np.zeros((1,NUMBER_NEURONS_SHL))
+error_OL = np.zeros((1,NUMBER_NEURONS_OL))
+
+
 
 
 """
@@ -82,18 +95,22 @@ def read_file():
 	line_index = 0
 	for line in input_file:
 		split_line = line.split(",")
-		label = int(split_line.pop(0))
-		pixels = [] #type: list
+		line_contents = [] #type: list
 		while len(split_line) > 0:
-			pixels.append(int(split_line.pop(0)))
-		image = Image(label, pixels)
+			line_contents.append(int(split_line.pop(0)))
 		if line_index < NUMBER_OF_IMAGES*PERCENTAGE_TRAINING:
-			training_set.append(image)
+			training_set.append(line_contents)
 		elif line_index < NUMBER_OF_IMAGES*PERCENTAGE_VALIDATION:
-			validation_set.append(image)
+			validation_set.append(line_contents)
 		else:
-			testing_set.append(image)
+			testing_set.append(line_contents)
 		line_index += 1
+	training_set = np.array(training_set)
+	training_set = training_set/255
+	validation_set = np.array(validation_set)
+	validation_set = validation_set/255
+	testing_set = np.array(testing_set)
+	testing_set = testing_set/255
 	return training_set, validation_set, testing_set
 
 def random_weight_generator(number_of_weights):
@@ -103,13 +120,16 @@ def random_weight_generator(number_of_weights):
 	return weights
 
 def initialize_neurons():
-	global neurons_hidden_layer, neurons_output_layer
+	global weights_FHL, weights_SHL, weights_OL
 	for i in range(NUMBER_NEURONS_FHL):
 		weights = random_weight_generator(IMAGE_SIZE+1)
-		neurons_hidden_layer.append(Neuron([0]*(IMAGE_SIZE), weights))
-	for i in range(NUMBER_NEURONS_OL):
+		weights_FHL[i] = weights
+	for i in range(NUMBER_NEURONS_SHL):
 		weights = random_weight_generator(NUMBER_NEURONS_FHL+1)
-		neurons_output_layer.append(Neuron([0]*NUMBER_NEURONS_FHL, weights))
+		weights_SHL[i] = weights
+	for i in range(NUMBER_NEURONS_OL):
+		weights = random_weight_generator(NUMBER_NEURONS_SHL+1)
+		weights_OL[i] = weights
 
 # Main function.
 
@@ -127,8 +147,8 @@ while learned == False:
 	counter = 0
 	counter_success = 0
 	for training_example in training_set:
-		for neuron in neurons_hidden_layer:
-			neuron.inputs = training_example.pixels
+		for neuron in inputs_FHL:
+			neuron = training_example[1:IMAGE_SIZE+2]
 			neuron.calculate_output()
 
 		inputs_output_layer = [] #type: list

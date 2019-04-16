@@ -102,6 +102,7 @@ for i = 1:numF
                 end
                 offspring(halfNumberOfChildren,:) = child;
             end
+            % I mutate.
             for indexMutation = 1:populationSize
                 randomProbability = rand;
                 if randomProbability < mutationProbability
