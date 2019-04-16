@@ -7,9 +7,9 @@ functions = [1 2 3 4 5 6 7 8 9 10]; %functions being solved
 numF = size(functions,2);
 nTimes = 20; % Number of times in which a function is going to be solved
 dimension = 30; % Dimension of the problem
-probabilityRecombination = 0.7;     
-mutationF = 0.3; % F in [0,2]
-populationSize = 100; % Adjust this to your algorithm
+probabilityRecombination = 0.9;     
+mutationF = 0.5; % F in [0,2]
+populationSize = 50; % Adjust this to your algorithm
 
 for i = 1:numF
     

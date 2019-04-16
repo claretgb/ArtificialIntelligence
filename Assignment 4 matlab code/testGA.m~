@@ -7,11 +7,10 @@ functions = [1 2 3 4 5 6 7 8 9 10]; %functions being solved
 numF = size(functions,2);
 nTimes = 20; % Number of times in which a function is going to be solved
 dimension = 30; % Dimension of the problem
-populationSize = 20; % Adjust this to your algorithm
-alp = 0.25;
-delta = 0.15;
-mutationProbability = 0.1;
-numberOfParticipants = int8(populationSize/4);
+populationSize = 150; % Adjust this to your algorithm
+alp = 0.45;
+delta = 0.12;
+mutationProbability = 0.14;
 
 for i = 1:numF
     
@@ -51,52 +50,78 @@ for i = 1:numF
             % Your algorithm goes here
 
             % Select parents and create offspring.
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            [~,indexBest] = min(populationFitness);
-            parentI = population(indexBest,:);
+            sum = 0;
+            for ind = 1:populationSize
+                sum = sum + populationFitness(ind);
+            end
+            roulette = zeros(1,populationSize);
+            for ind = 1:populationSize
+                roulette(ind) = populationFitness(ind)/sum;
+            end
             offspring = zeros(populationSize, dimension);
             for halfNumberOfChildren = 1:populationSize
                 child = zeros(1,dimension);
-                indexParentJ = indexBest;
-                while indexParentJ == indexBest
-                    indexParentJ = int8(1+(populationSize-1).*rand);
+                randRoulette1 = rand;
+                
+                % I choose Parent I.
+                sum1 = 0;
+                indexParentI = 0;
+                while sum1 < randRoulette1
+                    indexParentI = indexParentI + 1;
+                    sum1 = sum1 + roulette(indexParentI);
                 end
-                parentJ = population(indexParentJ,:);
+                parentI = population(indexParentI,:);
+                
+                parentJ = parentI;
+                while parentJ == parentI
+                    % I choose Parent J.
+                    sum2 = 0;
+                    indexParentJ = 0;
+                    while sum2 < randRoulette2
+                        indexParentJ = indexParentJ + 1;
+                        sum2 = sum2 + roulette(indexParentJ);
+                    end
+                    parentJ = population(indexParentJ,:);
+                end
+                
+                % I start the crossover.
                 for indexCrossover = 1:dimension
                     minFrame = min(parentI(indexCrossover), parentJ(indexCrossover));
                     maxFrame = max(parentI(indexCrossover), parentJ(indexCrossover));
                     difference = maxFrame - minFrame;
                     randGene = ((maxFrame+difference*alp)-(minFrame-difference*alp)).*rand + (minFrame-difference*alp);
                     child(indexCrossover) = randGene;
+                    if child(indexCrossover) > upper
+                        child(indexCrossover) = upper;
+                    else
+                        if child(indexCrossover) < lower
+                            child(indexCrossover) = lower;
+                        end
+                    end
                 end
                 offspring(halfNumberOfChildren,:) = child;
             end
             for indexMutation = 1:populationSize
                 randomProbability = rand;
                 if randomProbability < mutationProbability
-                    if indexMutation ~= indexBest
-                        for indexMutation2 = 1:dimension
-                            population(indexMutation,indexMutation2) = offspring(indexMutation,indexMutation2) + sqrt(delta)*randn(1);
-                        end
+                    for indexMutation2 = 1:dimension
+                        offspring(indexMutation,indexMutation2) = offspring(indexMutation,indexMutation2) + sqrt(delta)*randn(1);
                     end
                 end
             end
             
+                    offspringFitness = calculateFitnessPopulation_2005(fitfun, offspring, o, A, M, a, alpha, b); %Fitness values of all individuals (smaller value is better)
+            
+            for indComparation = 1:populationSize
+                if populationFitness(indComparation) > offspringFitness(indComparation)
+                    population(indComparation,:) = offspring(indComparation,:);
+                    populationFitness(indComparation) = offspringFitness(indComparation);
+                end
+            end
+            
+            
             % Your algorithm stops here
             
-            populationFitness = calculateFitnessPopulation_2005(fitfun, population, o, A, M, a, alpha, b); %Fitness values of all individuals (smaller value is better)
             bestSolutionFitness = min(populationFitness);
             currentEval = currentEval + populationSize;
             if bestSolutionFitness < globalFitness
