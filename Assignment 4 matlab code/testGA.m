@@ -9,7 +9,7 @@ nTimes = 20; % Number of times in which a function is going to be solved
 dimension = 30; % Dimension of the problem
 populationSize = 150; % Adjust this to your algorithm
 alp = 0.45;
-delta = 0.12;
+delta = 0.13;
 mutationProbability = 0.14;
 
 for i = 1:numF

@@ -9,6 +9,7 @@ from copy import copy
 from copy import deepcopy
 import random
 import math
+import numpy as np
 
 NUMBER_OF_IMAGES = 42000
 IMAGE_SIZE = 784
